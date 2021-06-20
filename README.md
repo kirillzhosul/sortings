@@ -1,2 +1,2 @@
-# gamemaker-sorting-visualization
- Sorting visualisation that was writtne in Game Maker (Studio 2.3).
+# Sorting Visualization
+### Sorting visualisation that was written in Game Maker (Studio 2.3).
