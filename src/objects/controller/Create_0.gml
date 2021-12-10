@@ -1,241 +1,231 @@
 /// @description Sorting Visualization
 // Author: Kirill Zhosul (@kirillzhosul)
 
-#region Initialising.
-
-#region Settings.
+#region Enumerations.
 
 // Sorting types.
-enum SortingType{
-	BubbleSort,
-	QuickSortLPS,
-	QuickSortHPS
+enum eSORTING_TYPE{
+	BUBBLE_SORT,
+	QUICK_SORT_LPS,
+	QUICK_SORT_HPS
 }
 
-// Width of the one line.
-#macro __SIZE 8
+#endregion
 
-// Size of the draw array.
-#macro __WIDTH floor(room_width / __SIZE)
-#macro __HEIGHT room_height
+#region Macros.
 
-// Dont change.
-#macro __OFFSET 1
+// Width of the line.
+#macro CELL_SIZE 8
 
-// Sorting algorithm for implementing.
-// SortingType.BubbleSort
-__SORTING = SortingType.BubbleSort
+// Size of the array.
+#macro ARRAY_WIDTH floor(room_width / CELL_SIZE)
+#macro ARRAY_HEIGHT room_height
 
 #endregion
 
 #region Functions.
 
-#region Sortings algorithms.
+#region Sorting algorithms.
 
-function __sorting_bubble_sort(){
-	// @function __sorting_bubble_sort()
-	// @description Function that implements bubble sort.
+function sorting_bubble_sort(){
+	// @description Bubble sort.
 	
 	// Current sorting index.
-	var _current_index = 0;
+	var current_index = 0;
 			
 	// Returning if finished.
-	if _current_index == __sorting_current_index2{
+	if current_index == sorting_current_index2{
 		// If reached start.
 				
 		// Finishing.
-		__sorting_is_finished = true;
+		sorting_is_finished = true;
 				
 		// Returning.
 		return;
 	}
 			
-	while(_current_index != __sorting_current_index2){
+	while(current_index != sorting_current_index2){
 		// While not reached end.
 				
-		if __sorted_array[_current_index] > __sorted_array[_current_index+1]{
+		if sorting_sorted_array[current_index] > sorting_sorted_array[current_index + 1]{
 			// If left bigger than right.
 					
 			// Swapping.
-			__array_swap(__sorted_array, _current_index, _current_index+1);
+			array_swap(sorting_sorted_array, current_index, current_index + 1);
 		}
 				
 		// Increasing index.
-		_current_index ++;
+		current_index ++;
 	}
 			
 	// Not process last line next time.
-	__sorting_current_index2 -- ;
+	// (Move left).
+	sorting_current_index2 -- ;
 }
 
-function __sorting_quick_sort_lps(_l, _r){
-	// @function __sorting_quick_sort_lps(_l, _r)
-	// @description Function that implements quick sort (Lomuto Partition Scheme).
+function sorting_quick_sort_lps(l, r){
+	// @description Quick sort (Lomuto Partition Scheme).
 	
-	// If not set defered sortings.
-	if _l < _r{
+	if l < r{
 		// If not pivot reached self.
 		
 		// Getting pivot partition.
-		var _pivot = __array_partition_lps(__sorted_array, _l, _r);
+		var _pivot = array_partition_lps(sorting_sorted_array, l, r);
 		
 		// Recursion to 2 parts.
-		__sorting_quick_sort_lps(_l, _pivot - 1);
-		__sorting_quick_sort_lps(_pivot + 1, _r);
+		sorting_quick_sort_lps(l, _pivot - 1);
+		sorting_quick_sort_lps(_pivot + 1, r);
 	}
 }
 
-function __sorting_quick_sort_hps(_l, _r){
-	// @function __sorting_quick_sort_hps(_l, _r)
-	// @description Function that implements quick sort (Hoare Partition Scheme).
+function sorting_quick_sort_hps(l, r){
+	// @description Quick sort (Hoare Partition Scheme).
 	
-	if _l < _r{
+	if l < r{
 		// If not pivot reached self.
 		
 		// Getting pivot partition.
-		var _pivot = __array_partition_hps(__sorted_array, _l, _r);
+		var pivot = array_partition_hps(sorting_sorted_array, l, r);
 		
 		// Recursion to 2 parts.
-		__sorting_quick_sort_hps(_l, _pivot);
-		__sorting_quick_sort_hps(_pivot + 1, _r);
+		sorting_quick_sort_hps(l, pivot);
+		sorting_quick_sort_hps(pivot + 1, r);
 	}
 }
 
 #endregion
 
-#region Sortings array mechanics.
+#region Sorting array mechanics.
 
-function __array_swap(_array, _index_one, _index_two){
-	// @function __array_swap(_array, _index_one, _index_two)
-	// @description Function that swaps array value.
+function array_swap(array, src, dst){
+	// @description Swaps array value.
 	
 	// Swap buffer.
-	var _swap_buffer = _array[@ _index_one];
+	var buffer = array[@ dst];
 	
 	// Swapping.
-	_array[@ _index_one] = _array[@ _index_two];
-	_array[@ _index_two] = _swap_buffer;
+	array[@ dst] = array[@ src];
+	array[@ src] = buffer;
 }
 
-function __array_partition_lps(_array, _l, _r){ 
-	// @function __array_partition_lps(_array, _l, _r)
-	// @description Function that returns array partition with lomuto partition scheme.
+function array_partition_lps(array, l, r){ 
+	// @description Aarray partition with lomuto partition scheme.
 	
 	// Getting pivot.
-    var _pivot = _array[@ _r];
+    var pivot = array[@ r];
 	
 	// Getting iterator.
-    var _i = _l;
+    var i = l;
 	
-    for (var _j = _l; _j < _r; _j++){
+    for (var j = l; j < r; j++){
 		// Iterating over partition.
 		
-        if _array[@ _j] < _pivot{
+        if array[@ j] < pivot{
 			// If pivot.
 			
 			// Swapping.
-			__array_swap(_array, _i, _j);
+			array_swap(array, i, j);
 			
 			// Increasing iterator.
-			_i++
+			i++
 		}
 	}
 	
 	// Swapping.
-	__array_swap(_array, _i, _r);
+	array_swap(array, i, r);
 	
 	// Returning iterator.
-    return _i
+    return i;
 }
 
-function __array_partition_hps(_array, _l, _r){ 
-	// @function __array_partition_lps(_array, _l, _r)
-	// @description Function that returns array partition with lomuto partition scheme.
+function array_partition_hps(array, l, r){ 
+	// @description Aarray partition with lomuto partition scheme.
 	
 	// Getting pivot.
-    var _pivot = _array[_l];
+    var pivot = array[l];
 	
 	// Getting iterators.
-    var _i = _l - 1;
-    var _j = _r + 1;
+    var i = l - 1;
+    var j = r + 1;
 	
     while(true){
 		// Infinity loop.
 		
 		// Increasing iterator.
-		_i++;
+		i++;
 		
-		while(_array[@ _i] < _pivot){
+		while(array[@ i] < pivot){
 			// While not reached pivot.
 
 			// Increasing iterator.
-			_i++;
+			i++;
 		}
 
 		// Decreasing iterator.
-		_j--;
+		j--;
 			
-		while(_array[@ _j] > _pivot){
+		while(array[@ j] > pivot){
 			// While not reached pivot.
 
 			// Decreasing iterator.
-			_j--;
+			j--;
 		}
 
 		// If final - return.
-		if _i >= _j return _j;
+		if i >= j return j;
 		
 		// Swapping.
-		__array_swap(_array, _i, _j);
+		array_swap(array, i, j);
 	}
+	
+	// Should be not reachable.
+	return -1;
 }
 
 #endregion
 
 #region Visualisation / controlling.
 
-function __get_current_sorting_name(){
-	// @function __get_current_sorting_name()
-	// @description Function that returns current sorting name as string.
+function get_current_sorting_name(){
+	// @description Returns current sorting name as string.
+	// @returns {string} Sorting Name.
 	
 	// Default sorting name.
-	var _sorting_name = "Not Implemented Sorting";
+	var sorting_name = "Not Implemented Sorting";
 	
-	switch(__SORTING){
+	switch(sorting_type){
 		// Bubble sort.
-		case SortingType.BubbleSort: _sorting_name = "Bubble Sort"; break;
-		case SortingType.QuickSortLPS: _sorting_name = "Quick Sort (Lomuto PS)"; break;
-		case SortingType.QuickSortHPS: _sorting_name = "Quick Sort (Hoare PS)"; break;
+		case eSORTING_TYPE.BUBBLE_SORT: sorting_name = "Bubble Sort"; break;
+		case eSORTING_TYPE.QUICK_SORT_LPS: sorting_name = "Quick Sort (Lomuto PS)"; break;
+		case eSORTING_TYPE.QUICK_SORT_HPS: sorting_name = "Quick Sort (Hoare PS)"; break;
 	}
 	
 	// Returning quoted sorting name.
-	return "\"" + _sorting_name + "\"";
+	return "\"" + sorting_name + "\"";
 }
 
-function __get_current_state(){
-	// @function __get_current_state()
-	// @description Function that returns current sorting state.
+function get_current_state(){
+	// @description Returns current sorting state.
+	// @returns {string} State
 	
 	// If finished returning finished state.
-	if __sorting_is_finished return "Finished!"
+	if sorting_is_finished return "Finished!"
 	
 	// Returning sorting state.
 	return "Sorting..."
 }
 
-function __draw_information(){
-	// @function __draw_information()
-	// @description Function that draws information about.
+function draw_information(){
+	// @description Draws information about.
 	
 	// Drawing.
 	draw_set_color(c_white);
 	draw_set_halign(fa_right);
-	draw_text(room_width, 0, __get_current_sorting_name() + "\nState: " + __get_current_state() + "\nControls: R - Restart sorting,\nTAB + R - Regenerate array and restart sorting\nSpace - Switch Pause\nEnter - Switch Sorting");
+	draw_text(room_width, 0, get_current_sorting_name() + "\nState: " + get_current_state() + "\nControls: R - Restart sorting,\nTAB + R - Regenerate array and restart sorting\nSpace - Switch Pause\nEnter - Switch Sorting");
 }
 
-function __hotkeys_process(){
-	// @function __hotkeys_process
-	// @description Function that processes hotkeys.
+function hotkeys_process(){
+	// @description Processes hotkeys.
 	
 	if keyboard_check_pressed(ord("R")){
 		// Resetting array.
@@ -243,175 +233,155 @@ function __hotkeys_process(){
 		if keyboard_check(vk_tab){
 			// If tab is holded.
 				
-			// Regenerating unsorted array.
-			__regenerate_unsorted_array();
+			// Regenerating.
+			sorting_regenerate_unsorted_array();
 		}
 			
-		// Resetting sorting.
-		__sorting_reset();
+		// Resetting.
+		sorting_reset();
 	}
 	
 	if keyboard_check_pressed(vk_enter){
 		// Switching sorting.
-					
-		// Changing sorting.
-		if __SORTING == SortingType.BubbleSort{
-			__SORTING = SortingType.QuickSortLPS;
-		}else{
-			if __SORTING == SortingType.QuickSortLPS{
-				__SORTING = SortingType.QuickSortHPS;
-			}else{
-				if __SORTING == SortingType.QuickSortHPS{
-					__SORTING = SortingType.BubbleSort;
-				}
-			}
+				
+		// Switching.
+		switch(sorting_type){
+			case eSORTING_TYPE.BUBBLE_SORT:
+				sorting_type = eSORTING_TYPE.QUICK_SORT_LPS
+			break;
+			case eSORTING_TYPE.QUICK_SORT_LPS:
+				sorting_type = eSORTING_TYPE.QUICK_SORT_HPS
+			break;
+			case eSORTING_TYPE.QUICK_SORT_HPS:
+				sorting_type = eSORTING_TYPE.BUBBLE_SORT
+			break;
 		}
 		
-		// Resetting sorting.
-		__sorting_reset();
+
+		// Resetting.
+		sorting_reset();
 	}
 	
 	if keyboard_check_pressed(vk_space){
 		// Pausing.
 		
 		// Pause.
-		__sorting_is_paused = not __sorting_is_paused;
+		sorting_is_paused = !sorting_is_paused;
 	}
 }
 
-function __sorting_visualize(){
-	// @function __sorting_visualize()
-	// @description Function that visualizes sorting.
+function sorting_visualize(){
+	// @description Visualizes sorting.
 	
 	// Processing.
-	__sorting_process();
+	sorting_process();
 	
 	// Drawing information.
-	__draw_information();
+	draw_information();
 	
 	// Process hotkeys.
-	__hotkeys_process();
+	hotkeys_process();
 	
 	// Drawing sorting.
-	for(var _index = 0; _index < __WIDTH; _index++){
+	for(var array_index = 0; array_index < ARRAY_WIDTH; array_index++){
 		// For every index.
 
 		// Getting value.
-		var _value = __sorted_array[_index];
+		var value = sorting_sorted_array[array_index];
 		
-		// Getting x position to draw.
-		var _x = _index * __SIZE;
+		// Getting position to draw at.
+		var draw_x = array_index * CELL_SIZE;
 
 		// Drawing line.
 		draw_set_color(c_white);
-		draw_rectangle(_x, __HEIGHT, _x + (__SIZE - __OFFSET), _value, false);
+		draw_rectangle(draw_x, ARRAY_HEIGHT, draw_x + (CELL_SIZE - 1), value, false);
 		draw_set_color(c_black);
-		draw_rectangle(_x + __OFFSET, __HEIGHT, _x + (__SIZE - __OFFSET), _value, true);
+		draw_rectangle(draw_x + 1, ARRAY_HEIGHT, draw_x + (CELL_SIZE - 1), value, true);
 	}
 }
 
 #endregion
 
-function __sorting_process(){
-	// @function __sorting_process()
-	// @description Function that process sorting.
+function sorting_process(){
+	// @description Processes sorting.
 	
-	// Returning if sound is paused.
-	if __sorting_is_paused return;
+	// Returning if is paused.
+	if sorting_is_paused return;
 	
-	switch(__SORTING){
-		case SortingType.BubbleSort:
-			// Implementing Bubble Sorting.
-			__sorting_bubble_sort();
+	switch(sorting_type){
+		case eSORTING_TYPE.BUBBLE_SORT:
+			// Bubble Sorting.
+			sorting_bubble_sort();
 		break;
-		case SortingType.QuickSortLPS:
-			// Implementing Quick Sorting (Lomuto PS).
-			__sorting_quick_sort_lps(__sorting_current_index1, __sorting_current_index2);
+		case eSORTING_TYPE.QUICK_SORT_LPS:
+			// Quick Sorting (Lomuto PS).
+			sorting_quick_sort_lps(sorting_current_index1, sorting_current_index2);
+			sorting_is_finished = true;
 		break;
-		case SortingType.QuickSortHPS:
-			// Implementing Quick Sorting (Hoare PS).
-			__sorting_quick_sort_hps(__sorting_current_index1, __sorting_current_index2);
+		case eSORTING_TYPE.QUICK_SORT_HPS:
+			//Quick Sorting (Hoare PS).
+			sorting_quick_sort_hps(sorting_current_index1, sorting_current_index2);
+			sorting_is_finished = true;
 		break;
 	}
 }
 
-function __regenerate_unsorted_array(){
-	// @function __regenerate_unsorted_array()
-	// @description Function that regenerates unsorted array.
+function sorting_regenerate_unsorted_array(){
+	// @description Regenerates unsorted array.
+
+	// Clean array.
+	sorting_unsorted_array = [];
 	
-	// Deleting
-	__unsorted_array = undefined;
-	
-	// Generating new.
-	
-	// Randomizing.
-	randomize();
-	
-	// Array.
-	__unsorted_array = [];
-	
-	for(var _index = 0; _index < __WIDTH; _index++){
+	for(var array_index = 0; array_index < ARRAY_WIDTH; array_index++){
 		// For every index.
 		
 		// Generating random value.
-		__unsorted_array[_index] = irandom_range(0, __HEIGHT);
+		sorting_unsorted_array[array_index] = irandom_range(0, ARRAY_HEIGHT);
 	}
 }
 
-function __sorting_reset(){
-	// @function __sorting_reset()
-	// @desrciption Function that reset sorting.
+function sorting_reset(){
+	// @desrciption Reset sorting.
 	
-	// Clearing sorted array.
-	__sorted_array = [];
-	
-	// Copying unsorted array.
-	array_copy(__sorted_array, 0, __unsorted_array, 0, array_length(__unsorted_array))
+	// Copying unsorted array to sorted (Make sorted array unsorted).
+	sorting_sorted_array = [];
+	array_copy(sorting_sorted_array, 0, sorting_unsorted_array, 0, array_length(sorting_unsorted_array))
 	
 	// Sorting is not finished.
-	__sorting_is_finished = false;
+	sorting_is_finished = false;
 	
-	// Current indeces for sorting.
-	__sorting_current_index1 = 0;
-	__sorting_current_index2 = __WIDTH - 1;
-	
-	// list of defered sorting calls.
-	__sorting_defered = [];
+	// Current indices for sorting.
+	sorting_current_index1 = 0;
+	sorting_current_index2 = ARRAY_WIDTH - 1;
 }
 
 #endregion
 
 #region Variables.
 
-// Unsurted array that used as template for restarting (may be regenerated also).
-__unsorted_array = [];
+// Arrays.
+// Unsorted array that used when resetting via `regenerate_unsorted_array()`.
+sorting_unsorted_array = [];
+sorting_sorted_array = [];
 
-// Sorted array that used as working array (not sorted, just may be sorted as used as working).
-__sorted_array = [];
+// Sorting states.
+sorting_is_finished = false;
+sorting_is_paused = false;
 
-// Is sorting finished or not.
-__sorting_is_finished = false;
+// Current indices for sorting.
+sorting_current_index1 = 0;
+sorting_current_index2 = ARRAY_WIDTH - 1;
 
-// Current indeces for sorting.
-__sorting_current_index1 = 0;
-__sorting_current_index2 = __WIDTH - 1;
-
-// Is sorting pause or not,
-__sorting_is_paused = false;
-
-// list of defered sorting calls.
-__sorting_defered = [];
+// Sorting algorithm to execute.
+sorting_type = eSORTING_TYPE.BUBBLE_SORT
 
 #endregion
 
-#region Entry point.
-
+// Randomizing.
+randomize();
+	
 // Regenerating.
-__regenerate_unsorted_array();
+sorting_regenerate_unsorted_array();
 
-// Resetting sorting.
-__sorting_reset();
-
-#endregion
-
-#endregion
+// Resetting.
+sorting_reset();
