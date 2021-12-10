@@ -245,7 +245,7 @@ function get_current_state(){
 function draw_information(){
 	// @description Draws information about.
 	
-	var text_information = "Name: " + get_current_sorting_name() + "\nState: " + get_current_state();
+	var text_information = "Name: " + get_current_sorting_name() + "\nState: " + get_current_state() + "\nQueue: " + string(ds_queue_size(sorting_deferred_calls));
 	var text_controls =  "R [Restart]\nTAB + R [Reset]\nSpace [Pause]\nEnter [Switch]";
 	
 	
@@ -356,51 +356,10 @@ function sorting_process(){
 		
 		// Get deferred call.
 		var deferred_call = ds_queue_dequeue(sorting_deferred_calls);
-			
-		// How much deferred callables we called.
-		var deferred_call_counter = 0;
-		
-		while (not is_undefined(deferred_call)){
-			// Iterate over all deffered calls.
 
-			// Call deferred function.
-			deferred_call.callable(deferred_call.l, deferred_call.r);
-			
-			// Increase call counter.
-			// TODO: Get rid of that!
-			deferred_call_counter ++;
-			
-			if deferred_call_counter == 1{
-				// If we reach end.
-				
-				// Create buffer queue.
-				var buffer_queue = ds_queue_create();
-				ds_queue_copy(buffer_queue, sorting_deferred_calls);
-				
-				// Get deferred call.
-				var buffer_deferred_call = ds_queue_dequeue(buffer_queue);
-				
-				while (not is_undefined(buffer_deferred_call)){
-					// Iterate over all buffer deffered calls.
-			
-					// Add to deferred deferred calls.
-					ds_queue_enqueue(sorting_deferred_deferred_calls, buffer_deferred_call)
-					
-					// Get next buffer deferred call.
-					buffer_deferred_call = ds_queue_dequeue(buffer_queue);
-				}
+		// Call deferred function.
+		deferred_call.callable(deferred_call.l, deferred_call.r);
 		
-				// Destroy buffer.
-				ds_queue_destroy(buffer_queue);
-				
-				// Do not process more.
-				break;
-			}
-			
-			// Get next deferred call.
-			deferred_call = ds_queue_dequeue(sorting_deferred_calls);
-		}
-			
 		if ds_queue_size(sorting_deferred_calls) == 0{
 			// If we not have any deferred calls.
 					
@@ -465,7 +424,6 @@ function sorting_reset(){
 	
 	// Reset deferred calls.
 	ds_queue_clear(sorting_deferred_calls);
-	ds_queue_clear(sorting_deferred_deferred_calls);
 	
 	// Sorting is not finished.
 	sorting_is_finished = false;
@@ -486,7 +444,6 @@ sorting_sorted_array = [];
 
 // Queue of deferred calls for sorting.
 sorting_deferred_calls = ds_queue_create();
-sorting_deferred_deferred_calls = ds_queue_create(); // WARNING: Get better name for that thing...
 
 // Sorting states.
 sorting_is_finished = false;
