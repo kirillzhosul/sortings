@@ -66,8 +66,6 @@ function sorting_bubble_sort(){
 				
 		// Finishing.
 		sorting_is_finished = true;
-				
-		// Returning.
 		return;
 	}
 			
@@ -88,6 +86,9 @@ function sorting_bubble_sort(){
 	// Not process last line next time.
 	// (Move left).
 	sorting_current_index2 -- ;
+	
+	// Defer next call.
+	deferr_call(sorting_bubble_sort, undefined, undefined);
 }
 
 function sorting_quick_sort_lps(l, r){
@@ -236,7 +237,7 @@ function get_current_state(){
 	// @returns {string} State
 	
 	// If finished returning finished state.
-	if sorting_is_finished return "Finished!"
+	if sorting_is_finished return "Sorted!"
 	
 	// Returning sorting state.
 	return "Sorting..."
@@ -245,10 +246,26 @@ function get_current_state(){
 function draw_information(){
 	// @description Draws information about.
 	
-	// Drawing.
-	draw_set_color(c_white);
+	var text_information = "Name: " + get_current_sorting_name() + "\nState: " + get_current_state();
+	var text_controls =  "R [Restart]\nTAB + R [Reset]\nSpace [Pause]\nEnter [Switch]";
+	
+	
+	// Draw information.
+	draw_set_color(c_gray);
+	draw_rectangle(0, 0, string_width(text_information), string_height(text_information), false);
+	draw_set_color(c_black);
+	draw_text(0, 0, text_information);
+	
+	// Draw constrols.
+	draw_set_color(c_gray);
 	draw_set_halign(fa_right);
-	draw_text(room_width, 0, get_current_sorting_name() + "\nState: " + get_current_state() + "\nControls: R - Restart sorting,\nTAB + R - Regenerate array and restart sorting\nSpace - Switch Pause\nEnter - Switch Sorting");
+	draw_rectangle(room_width - string_width(text_controls), 0, room_width, string_height(text_controls), false);
+	draw_set_color(c_black);
+	draw_text(room_width, 0, text_controls);
+
+	// Rset.
+	draw_set_halign(fa_left);
+	draw_set_color(c_white);
 }
 
 function hotkeys_process(){
@@ -299,13 +316,7 @@ function hotkeys_process(){
 
 function sorting_visualize(){
 	// @description Visualizes sorting.
-	
-	// Processing.
-	sorting_process();
-	
-	// Drawing information.
-	draw_information();
-	
+
 	// Process hotkeys.
 	hotkeys_process();
 	
@@ -325,6 +336,12 @@ function sorting_visualize(){
 		draw_set_color(c_black);
 		draw_rectangle(draw_x + 1, ARRAY_HEIGHT, draw_x + (CELL_SIZE - 1), value, true);
 	}
+		
+	// Processing.
+	sorting_process();
+	
+	// Drawing information.
+	draw_information();
 }
 
 #endregion
@@ -399,7 +416,9 @@ function sorting_process(){
 		if not sorting_is_finished{
 			// If we not finished.
 			
+			// Base case.
 			var callable = undefined;
+			
 			// Start call.
 			switch(sorting_type){
 				case eSORTING_TYPE.BUBBLE_SORT:
