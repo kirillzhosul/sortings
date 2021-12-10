@@ -1,6 +1,22 @@
 /// @description Sorting Visualization
 // Author: Kirill Zhosul (@kirillzhosul)
 
+#region Structs.
+
+function sSortingDefferedCall(callable, l, r) constructor{
+	// Deffered call structure.
+	// Implements container for deffered call.
+	// Hold function as callable field.
+	// Argument fields.
+	
+	// Fields.
+	self.callable = callable;  // Function to be called.
+	self.l = l;  // Left.
+	self.r = r;  // Rigth.
+}
+
+#endregion
+
 #region Enumerations.
 
 // Sorting types.
@@ -24,6 +40,17 @@ enum eSORTING_TYPE{
 #endregion
 
 #region Functions.
+
+#region Deferred calls.
+
+function deferr_call(callable, l, r){
+	// @description Deferrs call.
+	
+	// Deferr.
+	return ds_queue_enqueue(sorting_deferred_calls, new sSortingDefferedCall(callable, l, r));
+}
+
+#endregion
 
 #region Sorting algorithms.
 
@@ -70,11 +97,11 @@ function sorting_quick_sort_lps(l, r){
 		// If not pivot reached self.
 		
 		// Getting pivot partition.
-		var _pivot = array_partition_lps(sorting_sorted_array, l, r);
+		var pivot = array_partition_lps(sorting_sorted_array, l, r);
 		
 		// Recursion to 2 parts.
-		sorting_quick_sort_lps(l, _pivot - 1);
-		sorting_quick_sort_lps(_pivot + 1, r);
+		deferr_call(sorting_quick_sort_lps, l, pivot - 1);
+		deferr_call(sorting_quick_sort_lps, pivot + 1, r);
 	}
 }
 
@@ -88,8 +115,8 @@ function sorting_quick_sort_hps(l, r){
 		var pivot = array_partition_hps(sorting_sorted_array, l, r);
 		
 		// Recursion to 2 parts.
-		sorting_quick_sort_hps(l, pivot);
-		sorting_quick_sort_hps(pivot + 1, r);
+		deferr_call(sorting_quick_sort_hps, l, pivot);
+		deferr_call(sorting_quick_sort_hps, pivot + 1, r);
 	}
 }
 
@@ -308,22 +335,56 @@ function sorting_process(){
 	// Returning if is paused.
 	if sorting_is_paused return;
 	
-	switch(sorting_type){
-		case eSORTING_TYPE.BUBBLE_SORT:
-			// Bubble Sorting.
-			sorting_bubble_sort();
-		break;
-		case eSORTING_TYPE.QUICK_SORT_LPS:
-			// Quick Sorting (Lomuto PS).
-			sorting_quick_sort_lps(sorting_current_index1, sorting_current_index2);
-			sorting_is_finished = true;
-		break;
-		case eSORTING_TYPE.QUICK_SORT_HPS:
-			//Quick Sorting (Hoare PS).
-			sorting_quick_sort_hps(sorting_current_index1, sorting_current_index2);
-			sorting_is_finished = true;
-		break;
+	if not ds_queue_empty(sorting_deferred_calls){
+		// If we have any deffered calls.
+		
+		while (true){
+			// Iterate over all deffered calls.
+			
+			// Get deffered call.
+			var deffered_call = ds_queue_dequeue(sorting_deferred_calls);
+			
+			// Go out if reach end.
+			if is_undefined(deffered_call) break;
+			
+			// Call defered function.
+			deffered_call.callable(deffered_call.l, deffered_call.r);
+		}
+		
+		// Reset deffered calls.
+		ds_queue_clear(sorting_deferred_calls);
+	}else{
+		// If we dont have any deffered calls.
+		
+		if not sorting_is_finished{
+			// If we not finished.
+			
+			var callable = undefined;
+			// Start call.
+			switch(sorting_type){
+				case eSORTING_TYPE.BUBBLE_SORT:
+					// Bubble Sorting.
+					callable = sorting_bubble_sort;
+				break;
+				case eSORTING_TYPE.QUICK_SORT_LPS:
+					// Quick Sorting (Lomuto PS).
+					callable = sorting_quick_sort_lps;
+				break;
+				case eSORTING_TYPE.QUICK_SORT_HPS:
+					//Quick Sorting (Hoare PS).
+					callable = sorting_quick_sort_hps;
+				break;
+			}
+			
+			if not is_undefined(callable){
+				// If we have callable.
+				
+				// Call that callable.
+				callable(sorting_current_index1, sorting_current_index2);
+			}
+		}
 	}
+
 }
 
 function sorting_regenerate_unsorted_array(){
@@ -347,6 +408,9 @@ function sorting_reset(){
 	sorting_sorted_array = [];
 	array_copy(sorting_sorted_array, 0, sorting_unsorted_array, 0, array_length(sorting_unsorted_array))
 	
+	// Reset deffered calls.
+	ds_queue_clear(sorting_deferred_calls);
+	
 	// Sorting is not finished.
 	sorting_is_finished = false;
 	
@@ -363,6 +427,9 @@ function sorting_reset(){
 // Unsorted array that used when resetting via `regenerate_unsorted_array()`.
 sorting_unsorted_array = [];
 sorting_sorted_array = [];
+
+// Queue of deffered calls for sorting.
+sorting_deferred_calls = ds_queue_create();
 
 // Sorting states.
 sorting_is_finished = false;
