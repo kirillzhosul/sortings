@@ -65,7 +65,6 @@ function sorting_bubble_sort(){
 		// If reached start.
 				
 		// Finishing.
-		sorting_is_finished = true;
 		return;
 	}
 			
@@ -263,7 +262,7 @@ function draw_information(){
 	draw_set_color(c_black);
 	draw_text(room_width, 0, text_controls);
 
-	// Rset.
+	// Reset.
 	draw_set_halign(fa_left);
 	draw_set_color(c_white);
 }
@@ -400,15 +399,13 @@ function sorting_process(){
 			
 			// Get next deferred call.
 			deferred_call = ds_queue_dequeue(sorting_deferred_calls);
-
 		}
 			
 		if ds_queue_size(sorting_deferred_calls) == 0{
 			// If we not have any deferred calls.
 					
-			// Process deferred deferred calls then (later).
-			ds_queue_copy(sorting_deferred_calls, sorting_deferred_deferred_calls);
-			ds_queue_clear(sorting_deferred_deferred_calls);
+			// End sorting.
+			sorting_is_finished = true;
 		}
 	}else{
 		// If we dont have any deffered calls.
@@ -443,7 +440,6 @@ function sorting_process(){
 			}
 		}
 	}
-
 }
 
 function sorting_regenerate_unsorted_array(){
