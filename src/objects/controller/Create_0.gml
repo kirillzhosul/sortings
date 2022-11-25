@@ -23,7 +23,8 @@ function sSortingDefferedCall(callable, l, r) constructor{
 enum eSORTING_TYPE{
 	BUBBLE_SORT,
 	QUICK_SORT_LPS,
-	QUICK_SORT_HPS
+	QUICK_SORT_HPS,
+	BOGO_SORT
 }
 
 #endregion
@@ -122,6 +123,27 @@ function sorting_quick_sort_hps(l, r){
 		deferr_call(sorting_quick_sort_hps, l, pivot);
 		deferr_call(sorting_quick_sort_hps, pivot + 1, r);
 	}
+}
+
+function sorting_bogo_sort(){
+	// @description Bogo sort.
+	var current_index = 0;
+			
+	while(current_index != sorting_current_index2){
+		// While not reached end.
+
+		if (sorting_sorted_array[current_index] > sorting_sorted_array[current_index + 1]){
+			// If left bigger than right.
+			sorting_regenerate_sorted_array()
+
+			// Restart on next call.
+			deferr_call(sorting_bogo_sort, undefined, undefined);
+			return;
+		}
+		current_index ++;
+	}
+			
+	return 
 }
 
 #endregion
@@ -250,6 +272,7 @@ function get_current_sorting_name(){
 	switch(sorting_type){
 		// Bubble sort.
 		case eSORTING_TYPE.BUBBLE_SORT: sorting_name = "Bubble Sort"; break;
+		case eSORTING_TYPE.BOGO_SORT: sorting_name = "Bogo Sort (Random)"; break;
 		case eSORTING_TYPE.QUICK_SORT_LPS: sorting_name = "Quick Sort (Lomuto PS)"; break;
 		case eSORTING_TYPE.QUICK_SORT_HPS: sorting_name = "Quick Sort (Hoare PS)"; break;
 	}
@@ -323,6 +346,9 @@ function hotkeys_process(){
 				sorting_type = eSORTING_TYPE.QUICK_SORT_HPS;
 			break;
 			case eSORTING_TYPE.QUICK_SORT_HPS:
+				sorting_type = eSORTING_TYPE.BOGO_SORT;
+			break;
+			case eSORTING_TYPE.BOGO_SORT:
 				sorting_type = eSORTING_TYPE.BUBBLE_SORT;
 			break;
 		}
@@ -425,8 +451,12 @@ function sorting_process(){
 					callable = sorting_quick_sort_lps;
 				break;
 				case eSORTING_TYPE.QUICK_SORT_HPS:
-					//Quick Sorting (Hoare PS).
+					// Quick Sorting (Hoare PS).
 					callable = sorting_quick_sort_hps;
+				break;
+				case eSORTING_TYPE.BOGO_SORT:
+					// Bogo Sort (Random).
+					callable = sorting_bogo_sort;
 				break;
 			}
 			
@@ -447,12 +477,22 @@ function sorting_regenerate_unsorted_array(){
 	sorting_unsorted_array = [];
 	
 	for(var array_index = 0; array_index < ARRAY_WIDTH; array_index++){
-		// For every index.
-		
-		// Generating random value.
 		sorting_unsorted_array[array_index] = irandom_range(0, ARRAY_HEIGHT);
 	}
 }
+
+
+function sorting_regenerate_sorted_array(){
+	// @description Regenerates sorted array.
+
+	// Clean array.
+	sorting_sorted_array = [];
+	
+	for(var array_index = 0; array_index < ARRAY_WIDTH; array_index++){
+		sorting_sorted_array[array_index] = irandom_range(0, ARRAY_HEIGHT);
+	}
+}
+
 
 function sorting_reset(){
 	// @desrciption Reset sorting.
