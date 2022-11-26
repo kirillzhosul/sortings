@@ -4,10 +4,12 @@
 ### Sorting Types
 - [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort).
 - [Quick Sort](https://en.wikipedia.org/wiki/Quicksort) ([LPS](https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme), [HPS](https://en.wikipedia.org/wiki/Quicksort#Hoare_partition_scheme)).
+- [Bogo Sort](https://en.wikipedia.org/wiki/Bogosort).
 
 ### References
 [Quick Sort Wikipedia](https://en.wikipedia.org/wiki/Quicksort) \
-[Bubble Sort Wikipedia](https://en.wikipedia.org/wiki/Bubble_sort)
+[Bubble Sort Wikipedia](https://en.wikipedia.org/wiki/Bubble_sort) \
+[Bogo Sort Wikipedia](https://en.wikipedia.org/wiki/Bogosort)
 
 ### Preview
 ![Preview](preview.gif)
