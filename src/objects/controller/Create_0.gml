@@ -46,8 +46,6 @@ enum eSORTING_TYPE{
 
 function deferr_call(callable, l, r){
 	// @description Deferrs call.
-	
-	// Deferr.
 	ds_queue_enqueue(sorting_deferred_calls, new sSortingDefferedCall(callable, l, r));
 }
 
@@ -57,33 +55,23 @@ function deferr_call(callable, l, r){
 
 function sorting_bubble_sort(){
 	// @description Bubble sort.
-	
-	// Current sorting index.
 	var current_index = 0;
 			
-	// Returning if finished.
+	// Returning if finished (reached end).
 	if (current_index == sorting_current_index2){
-		// If reached start.
-				
-		// Finishing.
 		return;
 	}
-			
+
 	while(current_index != sorting_current_index2){
 		// While not reached end.
 				
 		if (sorting_sorted_array[current_index] > sorting_sorted_array[current_index + 1]){
 			// If left bigger than right.
 	
-						
 			array_push(sorting_draw_selected_indices_l, current_index);
 			array_push(sorting_draw_selected_indices_r, current_index + 1);
-			
-			// Swapping.
 			array_swap(sorting_sorted_array, current_index, current_index + 1);
 		}
-				
-		// Increasing index.
 		current_index ++;
 	}
 			
@@ -164,37 +152,25 @@ function array_swap(array, src, dst){
 function array_partition_lps(array, l, r){ 
 	// @description Aarray partition with lomuto partition scheme.
 	
-	// Getting pivot.
     var pivot = array[@ r];
-	
-	// Getting iterator.
     var i = l;
-	
+
     for (var j = l; j < r; j++){
 		// Iterating over partition.
 		
         if (array[@ j] < pivot){
 			// If pivot.
-			
-			// Swapping.
 			array_swap(array, i, j);
-			
-			// Increasing iterator.
 			i++;
 		}
 	}
-	
-	// Swapping.
 	array_swap(array, i, r);
-	
-	// Returning iterator.
     return i;
 }
 
 function array_partition_hps(array, l, r){ 
 	// @description Aarray partition with lomuto partition scheme.
 	
-	// Getting pivot.
     var pivot = array[@ l];
 	
 	// Getting iterators.
@@ -202,32 +178,21 @@ function array_partition_hps(array, l, r){
     var j = r + 1;
 	
     while(true){
-		// Infinity loop.
 		
-		// Increasing iterator.
 		i++;
-		
 		while(array[@ i] < pivot){
 			// While not reached pivot.
-
-			// Increasing iterator.
 			i++;
 		}
 
-		// Decreasing iterator.
 		j--;
-			
 		while(array[@ j] > pivot){
 			// While not reached pivot.
-
-			// Decreasing iterator.
 			j--;
 		}
 
 		// If final - return.
 		if (i >= j) return j;
-		
-		// Swapping.
 		array_swap(array, i, j);
 	}
 	
@@ -244,13 +209,8 @@ function array_in(array, element){
 	// Or use some other data structure.
 	// Linear - O(n), Binary -> O(log n)
 	
-	// Get array size.
 	var array_size = array_length(array);
-	
 	for (var array_index = 0; array_index < array_size; array_index++){
-		// Iterate over array.
-		
-		// Return found if this element.
 		if (array[@ array_index] == element) return true;
 	}
 	
@@ -284,11 +244,7 @@ function get_current_sorting_name(){
 function get_current_state(){
 	// @description Returns current sorting state.
 	// @returns {string} State
-	
-	// If finished returning finished state.
 	if (sorting_is_finished) return "Sorted!";
-	
-	// Returning sorting state.
 	return "Sorting...";
 }
 
@@ -321,23 +277,15 @@ function hotkeys_process(){
 	// @description Processes hotkeys.
 	
 	if (keyboard_check_pressed(ord("R"))){
-		// Resetting array.
-
+		// Reset.
 		if (keyboard_check(vk_tab)){
-			// If tab is holded.
-				
-			// Regenerating.
 			sorting_regenerate_unsorted_array();
 		}
-			
-		// Resetting.
 		sorting_reset();
 	}
 	
 	if (keyboard_check_pressed(vk_enter)){
 		// Switching sorting.
-				
-		// Switching.
 		switch(sorting_type){
 			case eSORTING_TYPE.BUBBLE_SORT:
 				sorting_type = eSORTING_TYPE.QUICK_SORT_LPS;
@@ -352,42 +300,29 @@ function hotkeys_process(){
 				sorting_type = eSORTING_TYPE.BUBBLE_SORT;
 			break;
 		}
-		
-		// Resetting.
 		sorting_reset();
 	}
 	
 	if (keyboard_check_pressed(vk_space)){
 		// Pausing.
-		
-		// Pause.
 		sorting_is_paused = !sorting_is_paused;
 	}
 }
 
 function sorting_visualize(){
 	// @description Visualizes sorting.
-
-	// Process hotkeys.
 	hotkeys_process();
 	
 	// Drawing sorting.
 	for(var array_index = 0; array_index < ARRAY_WIDTH; array_index++){
-		// For every index.
-
-		// Getting value.
 		var value = sorting_sorted_array[array_index];
 		
 		// Getting position to draw at.
 		var draw_x = array_index * CELL_SIZE;
 
-		// Base color.
+		// Color.
 		var color = c_white;
-		
-		// Get color.
 		color = array_in(sorting_draw_selected_indices_l, value) ? c_red : (array_in(sorting_draw_selected_indices_r, value) ? c_blue : color);
-		
-		// Set color.
 		draw_set_color(color);
 		
 		// Draw line.
@@ -397,10 +332,7 @@ function sorting_visualize(){
 	}
 	
 	
-	// Processing.
 	sorting_process();
-	
-	// Drawing information.
 	draw_information();
 }
 
@@ -419,25 +351,17 @@ function sorting_process(){
 	if (not ds_queue_empty(sorting_deferred_calls)){
 		// If we have any deferred calls.
 		
-		// Get deferred call.
 		var deferred_call = ds_queue_dequeue(sorting_deferred_calls);
-
-		// Call deferred function.
 		deferred_call.callable(deferred_call.l, deferred_call.r);
 		
 		if (ds_queue_size(sorting_deferred_calls) == 0){
 			// If we not have any deferred calls.
-					
-			// End sorting.
 			sorting_is_finished = true;
 		}
 	}else{
 		// If we dont have any deffered calls.
 		
 		if (not sorting_is_finished){
-			// If we not finished.
-			
-			// Base case.
 			var callable = undefined;
 			
 			// Start call.
@@ -461,9 +385,6 @@ function sorting_process(){
 			}
 			
 			if (not is_undefined(callable)){
-				// If we have callable.
-				
-				// Call that callable.
 				callable(sorting_current_index1, sorting_current_index2);
 			}
 		}
@@ -545,11 +466,6 @@ sorting_type = eSORTING_TYPE.BUBBLE_SORT;
 
 #endregion
 
-// Randomizing.
 randomize();
-	
-// Regenerating.
 sorting_regenerate_unsorted_array();
-
-// Resetting.
 sorting_reset();
